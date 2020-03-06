@@ -1,0 +1,15 @@
+Package: CovEstim
+Type: Package
+Title: (High-dimensional) Covariance Estimation
+Version: 0.1.0
+Author: Antoniya Shivarova
+Maintainer: Antoniya Shivarova <shivarova@europa-uni.de>
+Description: The package CovEstim provides various functions for estimating (high-dimensional) covariance 
+    matrices according to most recent advances in the academic literature.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Imports: Rdpack, POET, glasso, CVglasso, Rcpp (>= 1.0.3)
+RdMacros: Rdpack
+LinkingTo: Rcpp, RcppArmadillo  
+RoxygenNote: 7.0.2
