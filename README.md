@@ -94,6 +94,8 @@ sigma_lwcc_results <- sigma_estim_wrapper(sp_rets, sigma_estim_lwcc, res_all=TRU
 str(sigma_lwcc_results)
 ```
 
+### Example 3
+
 The linear and nonlinear shrinkage estimators by Ledoit and Wolf are implemented additionally in Rcpp for higher efficiency.
 An important note here is that while the R-function can deal with data frames and matrices, 
 the Rcpp-function requires the data to be preformated as a matrix.
@@ -105,18 +107,21 @@ str(sigma_lwcc_results)
 sigma_lwcc_results <- sigma_estim_wrapper(sp_rets, sigma_estim_lwcc_cpp, res_all=TRUE)
 str(sigma_lwcc_results)
 ```
-Some more complicated application would be
+### Example 4
+
+Some more complicated application would be the Approximate Factor Model with a nonlinear shrinkage estimation on the covariance matrix of residuals
 
 ```r
 sigma_afm_lwnl_results <- sigma_estim_wrapper(sp_rets, estim_func = sigma_estim_afm, resid_estim_func=sigma_estim_lwnl)
 str(sigma_afm_lwnl_results)
 ```
+### Example 5
 
-While the function sigma_estim_wrapper can take up any estimation function from the package, the function sigma_estim is interesting for the practical application.
-For example, if you want to calculate different covariance estimators for comparison purposes, sigma_estim is easier to work with.
+While the function sigma_estim_wrapper can take up any estimation function from the package, the function sigma_estim is interesting for practical applications.
+For example, if you want to calculate different covariance estimators on the same dataset for comparison purposes, sigma_estim is easier to work with.
 
 ```r
-# Maximum-Likelihood, Exact Factor Model and Approximate Factor Model with nonlinear shrinkage on the residuals
+# Maximum-Likelihood, Exact Factor Model, Ledoit-Wolf linear shrinkage and Approximate Factor Model with nonlinear shrinkage on the residuals:
 est_types <- c("ML", "EFM", "LW-IDENT", "AFM-LWNL") 
 sigma_list <- lapply(est_types, sigma_estim, data=sp_rets)
 ```
