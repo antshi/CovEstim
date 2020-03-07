@@ -8,7 +8,11 @@
 #' @param data an nxp data matrix.
 #' @param shrink_int a double, indicating the shrinkage intensity. Default is the optimal shrinkage intensity as in \insertCite{ledoit2003identity;textual}{CovEstim}.
 #' @param zeromean_log a logical, indicating whether the data matrix has zero means (TRUE) or not (FALSE). Default value is FALSE.
-#' @return a pxp estimated covariance matrix.
+#' @return a list with the following entries
+#'  \itemize{
+#'  \item a pxp estimated covariance matrix.
+#'  \item an estimation specific tuning parameter, here the shrinkage intensity.
+#'  }
 #'
 #' @details The Ledoit-Wolf linear shrinkage estimator of the covariance matrix towards the identity matrix is calculated with the following formula:
 #' \deqn{\hat{\Sigma}= s\Sigma_{T} + (1-s)\Sigma,}
@@ -40,7 +44,11 @@ sigma_estim_lwident_cpp <- function(data, shrink_int = -1, zeromean_log = FALSE)
 #' @param data an nxp data matrix.
 #' @param shrink_int a double, indicating the shrinkage intensity. Default is the optimal shrinkage intensity as in \insertCite{ledoit2004oneparam;textual}{CovEstim}.
 #' @param zeromean_log a logical, indicating whether the data matrix has zero means (TRUE) or not (FALSE). Default value is FALSE.
-#' @return a pxp estimated covariance matrix.
+#' @return a list with the following entries
+#'  \itemize{
+#'  \item a pxp estimated covariance matrix.
+#'  \item an estimation specific tuning parameter, here the shrinkage intensity.
+#'  }
 #'
 #' @details The Ledoit-Wolf linear shrinkage estimator of the covariance matrix towards the diagonal matrix of equal variances is calculated with the following formula:
 #' \deqn{\hat{\Sigma}= s\Sigma_{T} + (1-s)\Sigma,}
@@ -73,7 +81,11 @@ sigma_estim_lwone_cpp <- function(data, shrink_int = -1, zeromean_log = FALSE) {
 #' @param data an nxp data matrix.
 #' @param shrink_int a double, indicating the shrinkage intensity. Default is the optimal shrinkage intensity as in \insertCite{ledoit2004cc;textual}{CovEstim}.
 #' @param zeromean_log a logical, indicating whether the data matrix has zero means (TRUE) or not (FALSE). Default value is FALSE.
-#' @return a pxp estimated covariance matrix.
+#' @return a list with the following entries
+#'  \itemize{
+#'  \item a pxp estimated covariance matrix.
+#'  \item an estimation specific tuning parameter, here the shrinkage intensity.
+#'  }
 #'
 #' @details The Ledoit-Wolf linear shrinkage estimator of the covariance matrix towards the constant correlation covariance matrix is calculated with the following formula:
 #' \deqn{\hat{\Sigma}= s\Sigma_{T} + (1-s)\Sigma,}
@@ -107,7 +119,11 @@ sigma_estim_lwcc_cpp <- function(data, shrink_int = -1, zeromean_log = FALSE) {
 #' @param bandwidth_speed a double, indicating the speed at which the bandwidth vanishes in the number of variables p.
 #' Default value is -0.35.
 #' @param zeromean_log a logical, indicating whether the data matrix has zero means (TRUE) or not (FALSE). Default value is FALSE.
-#' @return a pxp estimated covariance matrix.
+#' @return a list with the following entries
+#'  \itemize{
+#'  \item a pxp estimated covariance matrix.
+#'  \item an estimation specific tuning parameter, here the bandwidth speed.
+#'  }
 #'
 #' @details The Ledoit-Wolf nonlinear shrinkage estimator of the covariance matrix is computed according to \insertCite{ledoit2018analytical;textual}{CovEstim}
 #' with the following formula:

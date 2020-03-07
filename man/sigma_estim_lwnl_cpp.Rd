@@ -15,7 +15,11 @@ Default value is -0.35.}
 \item{zeromean_log}{a logical, indicating whether the data matrix has zero means (TRUE) or not (FALSE). Default value is FALSE.}
 }
 \value{
-a pxp estimated covariance matrix.
+a list with the following entries
+ \itemize{
+ \item a pxp estimated covariance matrix.
+ \item an estimation specific tuning parameter, here the bandwidth speed.
+ }
 }
 \description{
 Computes the analytical Ledoit-Wolf nonlinear shrinkage estimator of the covariance matrix.

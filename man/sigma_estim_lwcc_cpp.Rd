@@ -14,7 +14,11 @@ sigma_estim_lwcc_cpp(data, shrink_int = -1, zeromean_log = FALSE)
 \item{zeromean_log}{a logical, indicating whether the data matrix has zero means (TRUE) or not (FALSE). Default value is FALSE.}
 }
 \value{
-a pxp estimated covariance matrix.
+a list with the following entries
+ \itemize{
+ \item a pxp estimated covariance matrix.
+ \item an estimation specific tuning parameter, here the shrinkage intensity.
+ }
 }
 \description{
 Computes the Ledoit-Wolf linear shrinkage estimator of the covariance matrix towards the constant correlation covariance matrix.

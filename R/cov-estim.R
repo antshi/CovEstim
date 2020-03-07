@@ -19,13 +19,13 @@
 #' @examples
 #' data(sp200)
 #' sp_rets <- sp200[,-1]
-#' sigma_ml <- sigma_estim_wrapper(sp_rets, estim_func=sigma_estim_ml)
+#' sigma_ml <- sigma_estim_wrapper(sp_rets, estim_func=sigma_estim_ml)[[1]]
 #'
 #'
 #' @export sigma_estim_wrapper
 #'
 sigma_estim_wrapper <-
-  function(data, estim_func, res_all = FALSE, ...) {
+  function(data, res_all = FALSE, estim_func, ...) {
     result <- estim_func(data, ...)
 
     if (res_all) {
@@ -59,7 +59,7 @@ sigma_estim_wrapper <-
 #' @examples
 #' data(sp200)
 #' sp_rets <- sp200[,-1]
-#' sigma_ml <- sigma_estim(sp_rets, "ML")
+#' sigma_ml <- sigma_estim(sp_rets, "ML")[[1]]
 #' sigma_lwcc <- sigma_estim(sp_rets, "LW-CC", param=0.3, res_all=TRUE)[[1]]
 #'
 #' @export sigma_estim
@@ -69,6 +69,7 @@ sigma_estim <-
            est_type,
            param = NULL,
            factors = NULL,
+           zeromean_log = FALSE,
            res_all = FALSE) {
     if (est_type == "SAMPLE") {
       result <- sigma_estim_sample(data)
@@ -121,12 +122,8 @@ sigma_estim <-
     } else if (est_type == "LW-CC-SF") {
       result <- sigma_estim_lwcc_sf(data, param)
 
-    } else if (est_type == "AFM+RIDGE") {
-      result <- sigma_estim_afm(data, factors, sigma_estim_ridge, param)
-
-    } else if (est_type == "AFM+LWNL") {
-      result <-
-        sigma_estim_afm(data, factors, sigma_estim_lwnl, param)
+    }else if (est_type == "AFM-LWNL") {
+      result <- sigma_estim_afm(data, factors, zeromean_log, sigma_estim_lwnl)
 
     }
 

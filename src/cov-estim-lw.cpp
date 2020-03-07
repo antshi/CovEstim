@@ -12,7 +12,11 @@ using namespace arma;
 //' @param data an nxp data matrix.
 //' @param shrink_int a double, indicating the shrinkage intensity. Default is the optimal shrinkage intensity as in \insertCite{ledoit2003identity;textual}{CovEstim}.
 //' @param zeromean_log a logical, indicating whether the data matrix has zero means (TRUE) or not (FALSE). Default value is FALSE.
-//' @return a pxp estimated covariance matrix.
+//' @return a list with the following entries
+//'  \itemize{
+//'  \item a pxp estimated covariance matrix.
+//'  \item an estimation specific tuning parameter, here the shrinkage intensity.
+//'  }
 //'
 //' @details The Ledoit-Wolf linear shrinkage estimator of the covariance matrix towards the identity matrix is calculated with the following formula:
 //' \deqn{\hat{\Sigma}= s\Sigma_{T} + (1-s)\Sigma,}
@@ -34,7 +38,7 @@ using namespace arma;
 //' @export sigma_estim_lwident_cpp
 //'
 // [[Rcpp::export]]
-arma::mat sigma_estim_lwident_cpp(arma::mat data, double shrink_int = -1, bool zeromean_log = false){
+List sigma_estim_lwident_cpp(arma::mat data, double shrink_int = -1, bool zeromean_log = false){
 
 	int p = data.n_cols;
 	int n = data.n_rows;
@@ -74,7 +78,7 @@ arma::mat sigma_estim_lwident_cpp(arma::mat data, double shrink_int = -1, bool z
 	arma::mat sigma_estim = shrink_int * sigma_target + (1 - shrink_int) * sigma_sample;
 
 
-	return sigma_estim;
+	return List::create(Rcpp::Named("sigma")=sigma_estim, Rcpp::Named("shrink")=shrink_int);
 }
 
 //' Ledoit-Wolf Linear Shrinkage Covariance Estimation II (CPP)
@@ -84,7 +88,11 @@ arma::mat sigma_estim_lwident_cpp(arma::mat data, double shrink_int = -1, bool z
 //' @param data an nxp data matrix.
 //' @param shrink_int a double, indicating the shrinkage intensity. Default is the optimal shrinkage intensity as in \insertCite{ledoit2004oneparam;textual}{CovEstim}.
 //' @param zeromean_log a logical, indicating whether the data matrix has zero means (TRUE) or not (FALSE). Default value is FALSE.
-//' @return a pxp estimated covariance matrix.
+//' @return a list with the following entries
+//'  \itemize{
+//'  \item a pxp estimated covariance matrix.
+//'  \item an estimation specific tuning parameter, here the shrinkage intensity.
+//'  }
 //'
 //' @details The Ledoit-Wolf linear shrinkage estimator of the covariance matrix towards the diagonal matrix of equal variances is calculated with the following formula:
 //' \deqn{\hat{\Sigma}= s\Sigma_{T} + (1-s)\Sigma,}
@@ -107,7 +115,7 @@ arma::mat sigma_estim_lwident_cpp(arma::mat data, double shrink_int = -1, bool z
 //' @export sigma_estim_lwone_cpp
 //'
 // [[Rcpp::export]]
-arma::mat sigma_estim_lwone_cpp(arma::mat data, double shrink_int = -1, bool zeromean_log = false){
+List sigma_estim_lwone_cpp(arma::mat data, double shrink_int = -1, bool zeromean_log = false){
 
   int p = data.n_cols;
   int n = data.n_rows;
@@ -154,7 +162,7 @@ arma::mat sigma_estim_lwone_cpp(arma::mat data, double shrink_int = -1, bool zer
   arma::mat sigma_estim = shrink_int * sigma_target + (1 - shrink_int) * sigma_sample;
 
 
-  return sigma_estim;
+  return List::create(Rcpp::Named("sigma")=sigma_estim, Rcpp::Named("shrink")=shrink_int);
 }
 
 //' Ledoit-Wolf Linear Shrinkage Covariance Estimation III (CPP)
@@ -164,7 +172,11 @@ arma::mat sigma_estim_lwone_cpp(arma::mat data, double shrink_int = -1, bool zer
 //' @param data an nxp data matrix.
 //' @param shrink_int a double, indicating the shrinkage intensity. Default is the optimal shrinkage intensity as in \insertCite{ledoit2004cc;textual}{CovEstim}.
 //' @param zeromean_log a logical, indicating whether the data matrix has zero means (TRUE) or not (FALSE). Default value is FALSE.
-//' @return a pxp estimated covariance matrix.
+//' @return a list with the following entries
+//'  \itemize{
+//'  \item a pxp estimated covariance matrix.
+//'  \item an estimation specific tuning parameter, here the shrinkage intensity.
+//'  }
 //'
 //' @details The Ledoit-Wolf linear shrinkage estimator of the covariance matrix towards the constant correlation covariance matrix is calculated with the following formula:
 //' \deqn{\hat{\Sigma}= s\Sigma_{T} + (1-s)\Sigma,}
@@ -187,7 +199,7 @@ arma::mat sigma_estim_lwone_cpp(arma::mat data, double shrink_int = -1, bool zer
 //' @export sigma_estim_lwcc_cpp
 //'
 // [[Rcpp::export]]
-arma::mat sigma_estim_lwcc_cpp(arma::mat data, double shrink_int = -1, bool zeromean_log = false){
+List sigma_estim_lwcc_cpp(arma::mat data, double shrink_int = -1, bool zeromean_log = false){
 
   int p = data.n_cols;
   int n = data.n_rows;
@@ -258,7 +270,7 @@ arma::mat sigma_estim_lwcc_cpp(arma::mat data, double shrink_int = -1, bool zero
   arma::mat sigma_estim = shrink_int * sigma_target + (1 - shrink_int) * sigma_sample;
 
 
-  return sigma_estim;
+  return  List::create(Rcpp::Named("sigma")=sigma_estim, Rcpp::Named("shrink")=shrink_int);
 }
 
 arma::mat pmax(arma::mat K, double comp_num){ /*replaces pmax*/
@@ -282,7 +294,11 @@ arma::mat pmax(arma::mat K, double comp_num){ /*replaces pmax*/
 //' @param bandwidth_speed a double, indicating the speed at which the bandwidth vanishes in the number of variables p.
 //' Default value is -0.35.
 //' @param zeromean_log a logical, indicating whether the data matrix has zero means (TRUE) or not (FALSE). Default value is FALSE.
-//' @return a pxp estimated covariance matrix.
+//' @return a list with the following entries
+//'  \itemize{
+//'  \item a pxp estimated covariance matrix.
+//'  \item an estimation specific tuning parameter, here the bandwidth speed.
+//'  }
 //'
 //' @details The Ledoit-Wolf nonlinear shrinkage estimator of the covariance matrix is computed according to \insertCite{ledoit2018analytical;textual}{CovEstim}
 //' with the following formula:
@@ -307,7 +323,7 @@ arma::mat pmax(arma::mat K, double comp_num){ /*replaces pmax*/
 //' @export sigma_estim_lwnl_cpp
 //'
 // [[Rcpp::export]]
-arma::mat sigma_estim_lwnl_cpp(arma::mat data, double bandwidth_speed=-1, bool zeromean_log = false){
+List sigma_estim_lwnl_cpp(arma::mat data, double bandwidth_speed=-1, bool zeromean_log = false){
 
   double p = data.n_cols;
   double n = data.n_rows;
@@ -389,7 +405,7 @@ arma::mat sigma_estim_lwnl_cpp(arma::mat data, double bandwidth_speed=-1, bool z
   arma::vec eigenval_lwnl = dtilde;
   arma::mat sigma_estim = eigvec*diagmat(eigenval_lwnl)*trans(eigvec);
 
-  return sigma_estim;
+  return List::create(Rcpp::Named("sigma")=sigma_estim, Rcpp::Named("bandwidth")=bandwidth_speed);
 }
 
 /*

@@ -4,7 +4,14 @@
 \alias{sigma_estim}
 \title{Wrapper Function for Covariance Estimation II}
 \usage{
-sigma_estim(data, est_type, param = NULL, factors = NULL, res_all = FALSE)
+sigma_estim(
+  data,
+  est_type,
+  param = NULL,
+  factors = NULL,
+  zeromean_log = FALSE,
+  res_all = FALSE
+)
 }
 \arguments{
 \item{data}{an nxp data matrix.}
@@ -34,7 +41,7 @@ according to the user-defined character string.
 \examples{
 data(sp200)
 sp_rets <- sp200[,-1]
-sigma_ml <- sigma_estim(sp_rets, "ML")
+sigma_ml <- sigma_estim(sp_rets, "ML")[[1]]
 sigma_lwcc <- sigma_estim(sp_rets, "LW-CC", param=0.3, res_all=TRUE)[[1]]
 
 }

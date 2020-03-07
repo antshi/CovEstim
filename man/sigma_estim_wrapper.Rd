@@ -4,17 +4,17 @@
 \alias{sigma_estim_wrapper}
 \title{Wrapper Function for Covariance Estimation I}
 \usage{
-sigma_estim_wrapper(data, estim_func, res_all = FALSE, ...)
+sigma_estim_wrapper(data, res_all = FALSE, estim_func, ...)
 }
 \arguments{
 \item{data}{an nxp data matrix.}
-
-\item{estim_func}{an estimation function.}
 
 \item{res_all}{a logical, defining the return object.
 If FALSE, only the estimated covariance matrix is returned.
 If TRUE, a list with two entries is returned. The first entry is the estimated covariance matrix.
 The second entry is the estimation specific (tuning) parameter. Default value is FALSE.}
+
+\item{estim_func}{an estimation function.}
 
 \item{...}{additional parameters, parsed to estim_func.}
 }
@@ -32,7 +32,7 @@ according to the user-defined function.
 \examples{
 data(sp200)
 sp_rets <- sp200[,-1]
-sigma_ml <- sigma_estim_wrapper(sp_rets, estim_func=sigma_estim_ml)
+sigma_ml <- sigma_estim_wrapper(sp_rets, estim_func=sigma_estim_ml)[[1]]
 
 
 }

@@ -169,8 +169,8 @@ sigma_estim_efm <- function(data,
 #' @examples
 #' data(sp200)
 #' sp_rets <- sp200[,-1]
-#' sigma_afm <- sigma_estim_afm(sp_rets, estim_func=sigma_estim_lwnl)[[1]]
-#' results_afm <- sigma_estim_afm(sp_rets, estim_func=sigma_estim_lwone, shrink_int=0.1)
+#' sigma_afm <- sigma_estim_afm(sp_rets, resid_estim_func=sigma_estim_lwnl)[[1]]
+#' results_afm <- sigma_estim_afm(sp_rets, resid_estim_func=sigma_estim_lwone, shrink_int=0.1)
 #' sigma_afm <- results_afm[[1]]
 #' param_afm <- results_afm[[2]]
 #'
@@ -180,7 +180,7 @@ sigma_estim_afm <-
   function(data,
            factors = NULL,
            zeromean_log = FALSE,
-           estim_func,
+           resid_estim_func,
            ...) {
     data <- as.matrix(data)
 
@@ -201,7 +201,7 @@ sigma_estim_afm <-
     factor_res <- fm$residuals
     sigma_fm <- factor_betas %*% sigma_factors %*% t(factor_betas)
     res_estim <-
-      sigma_estim_wrapper(factor_res, estim_func, res_all = TRUE, ...)
+      sigma_estim_wrapper(factor_res, res_all = TRUE, resid_estim_func, ...)
     sigma_res <- res_estim[[1]]
     param_res <- res_estim[[2]]
 

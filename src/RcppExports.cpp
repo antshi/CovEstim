@@ -7,7 +7,7 @@
 using namespace Rcpp;
 
 // sigma_estim_lwident_cpp
-arma::mat sigma_estim_lwident_cpp(arma::mat data, double shrink_int, bool zeromean_log);
+List sigma_estim_lwident_cpp(arma::mat data, double shrink_int, bool zeromean_log);
 RcppExport SEXP _CovEstim_sigma_estim_lwident_cpp(SEXP dataSEXP, SEXP shrink_intSEXP, SEXP zeromean_logSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -20,7 +20,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // sigma_estim_lwone_cpp
-arma::mat sigma_estim_lwone_cpp(arma::mat data, double shrink_int, bool zeromean_log);
+List sigma_estim_lwone_cpp(arma::mat data, double shrink_int, bool zeromean_log);
 RcppExport SEXP _CovEstim_sigma_estim_lwone_cpp(SEXP dataSEXP, SEXP shrink_intSEXP, SEXP zeromean_logSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -33,7 +33,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // sigma_estim_lwcc_cpp
-arma::mat sigma_estim_lwcc_cpp(arma::mat data, double shrink_int, bool zeromean_log);
+List sigma_estim_lwcc_cpp(arma::mat data, double shrink_int, bool zeromean_log);
 RcppExport SEXP _CovEstim_sigma_estim_lwcc_cpp(SEXP dataSEXP, SEXP shrink_intSEXP, SEXP zeromean_logSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -46,7 +46,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // sigma_estim_lwnl_cpp
-arma::mat sigma_estim_lwnl_cpp(arma::mat data, double bandwidth_speed, bool zeromean_log);
+List sigma_estim_lwnl_cpp(arma::mat data, double bandwidth_speed, bool zeromean_log);
 RcppExport SEXP _CovEstim_sigma_estim_lwnl_cpp(SEXP dataSEXP, SEXP bandwidth_speedSEXP, SEXP zeromean_logSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
