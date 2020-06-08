@@ -7,31 +7,31 @@
 sigma_estim_glasso(
   data,
   rho = NULL,
-  rho_seq = NULL,
-  rho_seq_len = 10,
+  rho_len = 100,
   rho_seq_min_ratio = 0.001,
+  type = "cor",
   nfolds = 5,
-  crit = "BIC",
+  crit = "loglik",
   pendiag_log = FALSE,
-  start = "cold",
-  tol = 1e-05,
+  start = "warm",
+  tol = 1e-04,
   maxit = 10000,
-  cores = 1
+  cores = 1,
+  seed = 1234
 )
 }
 \arguments{
 \item{data}{an nxp data matrix.}
 
-\item{rho}{a double, the non-negative regularization parameter \eqn{\rho} for lasso. \eqn{\rho=0} means no regularization.
+\item{rho}{a double or a sequence, the non-negative regularization parameter \eqn{\rho} for lasso. \eqn{\rho=0} means no regularization.
 Can be a scalar (usual) or a symmetric p by p matrix, or a vector of length p. In the latter case, the penalty matrix has jkth element \eqn{\sqrt{\rho_j*\rho_k}}. Default value is NULL
 and an optimal regularization is computed with the cross-validation (CV) procedure as in \insertCite{cvglassopackage;textual}{CovEstim}.}
 
-\item{rho_seq}{a user-sapplied sequence of possible values for the regularization parameter \eqn{\rho}. Default value is NULL and
-a sequence is defined as in \insertCite{cvglassopackage;textual}{CovEstim}.}
-
-\item{rho_seq_len}{an integer, indicating the length for setting the rho sequence.}
+\item{rho_len}{an integer, indicating the length for setting the rho sequence.}
 
 \item{rho_seq_min_ratio}{a double, the minimum ratio for deviation between the rho values in the sequence.}
+
+\item{type}{a character, the type of matrix to be estimated. Possible values are c("cor", "cov"). Default value is "cor" for the correlation matrix.}
 
 \item{nfolds}{an integer, indicating the number of folds for the CV. Default value is 5.}
 
@@ -46,6 +46,8 @@ a sequence is defined as in \insertCite{cvglassopackage;textual}{CovEstim}.}
 \item{maxit}{an integer, indicating the maximum number of iterations for the glasso algorithm. Default value is set to 10000.}
 
 \item{cores}{an integer, indicating how many cores should be used for the CV. Default value is 1. cores cannot be higher than the maximum number of cores of the processor in use.}
+
+\item{seed}{an integer, the seed for the performed cross-validation. Default value is 1234.}
 }
 \value{
 a list with the following entries
@@ -64,7 +66,7 @@ The GLASSO estimator is elaborated in detail in \insertCite{friedman2008sparse;t
 \examples{
 data(sp200)
 sp_rets <- sp200[,-1]
-sigma_glasso <- sigma_estim_glasso(sp_rets, rho=0.0001)[[1]]
+sigma_glasso <- sigma_estim_glasso(sp_rets, type="cov", rho=0.0001)[[1]]
 
 }
 \references{

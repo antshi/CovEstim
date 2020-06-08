@@ -22,6 +22,8 @@ sigma_estim(
 
 \item{factors}{a nxm data matrix of factors.}
 
+\item{zeromean_log}{a logical, indicating whether the data matrix has zero means (TRUE) or not (FALSE). Default value is FALSE.}
+
 \item{res_all}{a logical, defining the return object.
 If FALSE, only the estimated covariance matrix is returned.
 If TRUE, a list with two entries is returned. The first entry is the estimated covariance matrix.

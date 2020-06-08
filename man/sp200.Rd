@@ -4,11 +4,13 @@
 \name{sp200}
 \alias{sp200}
 \title{200 monthly stock returns}
-\format{A data frame(382x201) with
+\format{
+A data frame(382x201) with
 \itemize{
 \item date, in YY-mm format
 \item 200 stocks returns
-}}
+}
+}
 \usage{
 data(sp200)
 }
