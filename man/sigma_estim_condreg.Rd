@@ -9,8 +9,8 @@ sigma_estim_condreg(
   k = NULL,
   k_seq = NULL,
   k_seq_len = 50,
-  k_seq_minratio = 0.001,
-  nfolds = 5
+  nfolds = 5,
+  zeromean_log = FALSE
 )
 }
 \arguments{
@@ -24,9 +24,9 @@ Default value is NULL and the sequence is generated in dependence of the sample 
 
 \item{k_seq_len}{an integer, indicating the length of k_seq. Default value is 50.}
 
-\item{k_seq_minratio}{a double, indicating the minimum deviation ratio of the values for k_seq. Default value is 0.001.}
-
 \item{nfolds}{an integer, specifying the number of folds for the CV. Default value is 5.}
+
+\item{zeromean_log}{a logical, indicating whether the data matrix has zero means (TRUE) or not (FALSE). Default value is FALSE.}
 }
 \value{
 a list with the following entries

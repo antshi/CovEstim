@@ -8,8 +8,8 @@
 #' @param k_seq a vector of doubles, specifying the grid of k values to search over within the CV.
 #' Default value is NULL and the sequence is generated in dependence of the sample covariance matrix, the user-supplied length and the minimum deviation ratio of the values.
 #' @param k_seq_len an integer, indicating the length of k_seq. Default value is 50.
-#' @param k_seq_minratio a double, indicating the minimum deviation ratio of the values for k_seq. Default value is 0.001.
 #' @param nfolds an integer, specifying the number of folds for the CV. Default value is 5.
+#' @param zeromean_log a logical, indicating whether the data matrix has zero means (TRUE) or not (FALSE). Default value is FALSE.
 #'
 #' @return a list with the following entries
 #' \itemize{
@@ -39,29 +39,31 @@ sigma_estim_condreg <-
            k = NULL,
            k_seq = NULL,
            k_seq_len = 50,
-           k_seq_minratio = 0.001,
-           nfolds = 5) {
+           nfolds = 5,
+           zeromean_log = FALSE) {
     data <- as.matrix(data)
-    n <- dim(data)[1]
-    centered <- apply(data, 2, function(x)
-      x - mean(x))
-    sigma_sample <- t(centered) %*% centered / (n - 1)
-
-    eigen_tmp <- eigen(sigma_sample)
-    eigenval <- eigen_tmp$values
-    eigenvec <- eigen_tmp$vectors
-
-    if (is.null(k)) {
-      if (is.null(k_seq)) {
-        cat("No grid for the CV is defined. The default grid calculation is applied.\n")
-        k_seq <- kseq_calc(sigma_sample, k_seq_minratio, k_seq_len)
-      }
-      k <- kmax_cv_condreg(data, k_seq, nfolds)
+    if (!zeromean_log) {
+      centered <- apply(data, 2, function(x)
+        x - mean(x))
+      n <- dim(data)[1] - 1
+    } else{
+      centered <- data
+      n <- dim(data)[1]
     }
 
-    eigenval_condreg <- as.numeric(lbar_solver(eigenval, k)$lbar)
+    sigma_sample <- t(centered) %*% centered / n
 
-    sigma_mat <- eigenvec %*% diag(eigenval_condreg) %*% t(eigenvec)
+    svd_sigma_sample <- svd(sigma_sample)
+    eigenval <- svd_sigma_sample$d
+    u <- svd_sigma_sample$u
+
+    if (is.null(k)) {
+      k <- kmax_cv_condreg(data, k_seq, k_seq_len, nfolds, zeromean_log)
+    }
+
+    sol <- lbar_solver(eigenval, k)
+    eigenval_condreg <- as.numeric(sol$lbar)
+    sigma_mat <- u %*% diag(eigenval_condreg) %*% t(u)
 
     colnames(sigma_mat) <- colnames(data)
     rownames(sigma_mat) <- colnames(data)
@@ -71,19 +73,16 @@ sigma_estim_condreg <-
   }
 
 kseq_calc <- function(mat,
-                      k_seq_minratio = 0.001,
                       k_seq_len = 50) {
   k_max <- kappa(mat, exact = TRUE)
-  k_min <- k_seq_minratio * k_max
   k_seq <-
-    sort(10 ^ seq(log10(k_min), log10(k_max), length = k_seq_len), decreasing =
-           TRUE)
+    sort(10 ^ seq(log10(1), log10(k_max), length = k_seq_len), decreasing = TRUE)
   return(k_seq)
 }
 
 
 kseq_calc_orig <- function(k_max = 30,
-                           k_seq_len = 20) {
+                           k_seq_len = 50) {
   k_seq <- 1 / (seq(1, k_max, length.out = k_seq_len))
   k_seq <- k_seq - min(k_seq)
   k_seq <-  k_seq / max(k_seq)
@@ -93,19 +92,25 @@ kseq_calc_orig <- function(k_max = 30,
 
 kmax_cv_condreg <-
   function(data,
-           k_seq,
-           k_seq_minratio = 0.001,
+           k_seq = NULL,
            k_seq_len = 50,
-           nfolds = 20) {
+           nfolds = 5,
+           zeromean_log = FALSE) {
     data <- as.matrix(data)
-    n <- dim(data)[1]
+    if (!zeromean_log) {
+      centered <- apply(data, 2, function(x)
+        x - mean(x))
+      n <- dim(data)[1] - 1
+    } else{
+      centered <- data
+      n <- dim(data)[1]
+    }
+
     p <- dim(data)[2]
-    centered <- apply(data, 2, function(x)
-      x - mean(x))
-    sigma_sample <- t(centered) %*% centered / (n - 1)
+    sigma_sample <- t(centered) %*% centered / n
 
     if (is.null(k_seq)) {
-      k_seq <- kseq_calc(sigma_sample, k_seq_minratio, k_seq_len)
+      k_seq <- kseq_calc(sigma_sample, k_seq_len)
     }
     g <- length(k_seq)
     sections <- cut(1:n, breaks = nfolds, labels = c(1:nfolds))
@@ -119,16 +124,15 @@ kmax_cv_condreg <-
       xtest <- data[tsindx, , drop = FALSE]
       ntr <- nrow(xtrain)
       nts <- nrow(xtest)
-      sigma_sample_train <- (t(xtrain) %*% xtrain) / ntr
 
-      soln <- condreg_bulk(sigma_sample_train, k_seq)
+      soln <- condreg_bulk(xtrain, k_seq, zeromean_log)
       ytest <- xtest %*% soln$Q
       a <- array(ytest ^ 2, dim = c(nts, p, g))
       a <- aperm(a, c(2, 1, 3))
       b <- array(1 / soln$lbar, dim = c(g, p, nts))
       b <- aperm(b, c(2, 3, 1))
       ztest <- a * b
-      negloglikelihood[i,] <-
+      negloglikelihood[i, ] <-
         rowSums(aperm(ztest, dim = c(3, 1, 2))) / nts + rowSums(log(soln$lbar))
 
       L <- rep(0, p)
@@ -146,6 +150,7 @@ kmax_cv_condreg <-
   }
 
 lbar_solver <- function(L, k, dir = "forward") {
+
   p <- length(L)
   g <- length(k)
 
@@ -158,7 +163,7 @@ lbar_solver <- function(L, k, dir = "forward") {
   degenindx <- (k > (L[1] / L[p]))
 
   if (sum(degenindx) > 0) {
-    lbar[which(degenindx),] <-
+    lbar[which(degenindx), ] <-
       matrix(L, sum(degenindx), p, byrow = TRUE)
     uopt[degenindx] <- pmax(1 / k[degenindx] / L[p], 1 / L[1])
     intv[degenindx] <- TRUE
@@ -185,7 +190,7 @@ lbar_solver <- function(L, k, dir = "forward") {
                                                                    rep(1 / L, length(kmax1)), ncol = p, byrow = TRUE
                                                                  )))
 
-    lbar[!degenindx,] <- 1 / lambda
+    lbar[!degenindx, ] <- 1 / lambda
     uopt[!degenindx] <- uopt
     intv[!degenindx] <- FALSE
   }
@@ -200,6 +205,7 @@ lbar_solver <- function(L, k, dir = "forward") {
 
 
 path_forward <- function(L) {
+
   p <- length(L)
   idxzero <- L < .Machine$double.eps
   numzero <- sum(idxzero)
@@ -354,13 +360,20 @@ path_backward <- function(L) {
   return(list(k = kmax, u = u, v = v))
 }
 
-condreg_bulk <- function(data, k_seq) {
+
+condreg_bulk <- function(data, k_seq, zeromean_log = FALSE) {
   data <- as.matrix(data)
-  n <- dim(data)[1]
+  if (!zeromean_log) {
+    centered <- apply(data, 2, function(x)
+      x - mean(x))
+    n <- dim(data)[1] - 1
+  } else{
+    centered <- data
+    n <- dim(data)[1]
+  }
+
+  sigma_sample <- t(centered) %*% centered / n
   p <- dim(data)[2]
-  centered <- apply(data, 2, function(x)
-    x - mean(x))
-  sigma_sample <- t(centered) %*% centered / (n - 1)
 
   g <- length(k_seq)
   svdS <- svd(sigma_sample)
