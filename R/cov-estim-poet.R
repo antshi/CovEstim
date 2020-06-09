@@ -27,7 +27,6 @@
 #' sigma_poet <- sigma_estim_poet(sp_rets, K=2)[[1]] # user-defined K
 #' sigma_poet <- sigma_estim_poet(sp_rets)[[1]] # optimal K
 #'
-#' @import POET
 #'
 #' @importFrom Rdpack reprompt
 #' @references

@@ -33,7 +33,7 @@
 #'
 sigma_estim_lwnl <-
   function(data,
-           bandwidth_speed = -0.35,
+           bandwidth_speed = NULL,
            zeromean_log = FALSE) {
     data <- as.matrix(data)
     p <- dim(data)[2]
@@ -58,7 +58,9 @@ sigma_estim_lwnl <-
     ident_mat <-
       matrix(rep.int(1, min(p, n) * 1), nrow = 1, ncol = min(p, n))
     lambda_mat <- kronecker(ident_mat, lambda)
-
+    if(is.null(bandwidth_speed)){
+        bandwidth_speed <- -0.35
+    }
     h <- n ^ (bandwidth_speed)
     h_mat <- h * t(lambda_mat)
     x <- (lambda_mat - t(lambda_mat)) / h_mat

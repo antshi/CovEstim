@@ -4,7 +4,7 @@
 \alias{sigma_estim_lwnl}
 \title{Ledoit-Wolf Covariance Estimation (Nonlinear Shrinkage)}
 \usage{
-sigma_estim_lwnl(data, bandwidth_speed = -0.35, zeromean_log = FALSE)
+sigma_estim_lwnl(data, bandwidth_speed = NULL, zeromean_log = FALSE)
 }
 \arguments{
 \item{data}{an nxp data matrix.}

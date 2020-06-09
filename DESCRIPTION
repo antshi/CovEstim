@@ -9,7 +9,7 @@ Description: The package CovEstim provides various functions for estimating (hig
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-Imports: Rdpack, POET, parallel, doParallel, foreach, glasso, CVglasso, Rcpp (>= 1.0.3)
+Imports: Rdpack, parallel, doParallel, foreach, glasso, CVglasso, Rcpp (>= 1.0.3)
 RdMacros: Rdpack
 LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 7.1.0
