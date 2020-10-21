@@ -8,7 +8,7 @@ sigma_estim_afm(
   data,
   factors = NULL,
   zeromean_log = FALSE,
-  resid_estim_func,
+  resid_est_func,
   ...
 )
 }
@@ -19,9 +19,9 @@ sigma_estim_afm(
 
 \item{zeromean_log}{a logical, indicating whether the data matrix has zero means (TRUE) or not (FALSE). Default value is FALSE.}
 
-\item{...}{further arguments to be parsed to estim_func.}
+\item{resid_est_func}{a covariance estimation function, applied to the residuals covariance matrix.}
 
-\item{estim_func}{a covariance estimation function, applied to the residuals covariance matrix.}
+\item{...}{further arguments to be parsed to resid_est_func}
 }
 \value{
 a list with the following entries
@@ -41,8 +41,8 @@ where \eqn{\hat{\Sigma}_F} is the sample covariance matrix of the common factors
 \examples{
 data(sp200)
 sp_rets <- sp200[,-1]
-sigma_afm <- sigma_estim_afm(sp_rets, resid_estim_func=sigma_estim_lwnl)[[1]]
-results_afm <- sigma_estim_afm(sp_rets, resid_estim_func=sigma_estim_lwone, shrink_int=0.1)
+sigma_afm <- sigma_estim_afm(sp_rets, resid_est_func=sigma_estim_lwnl)[[1]]
+results_afm <- sigma_estim_afm(sp_rets, resid_est_func=sigma_estim_lwone, shrink_int=0.1)
 sigma_afm <- results_afm[[1]]
 param_afm <- results_afm[[2]]
 

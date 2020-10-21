@@ -4,12 +4,13 @@
 #' according to the user-defined function.
 #'
 #' @param data an nxp data matrix.
+#' @param est_func an estimation function.
 #' @param res_all a logical, defining the return object.
 #' If FALSE, only the estimated covariance matrix is returned.
 #' If TRUE, a list with two entries is returned. The first entry is the estimated covariance matrix.
 #' The second entry is the estimation specific (tuning) parameter. Default value is FALSE.
-#' @param estim_func an estimation function.
-#' @param ... additional parameters, parsed to estim_func.
+#' @param ... additional parameters, parsed to est_func
+#'
 #' @return a list with the following entries
 #' \itemize{
 #' \item a pxp estimated covariance matrix.
@@ -19,14 +20,14 @@
 #' @examples
 #' data(sp200)
 #' sp_rets <- sp200[,-1]
-#' sigma_ml <- sigma_estim_wrapper(sp_rets, estim_func=sigma_estim_ml)[[1]]
+#' sigma_ml <- sigma_estim_wrapper(sp_rets, est_func=sigma_estim_ml)[[1]]
 #'
 #'
 #' @export sigma_estim_wrapper
 #'
 sigma_estim_wrapper <-
-  function(data, res_all = FALSE, estim_func, ...) {
-    result <- estim_func(data, ...)
+  function(data, est_func, res_all = FALSE, ...) {
+    result <- est_func(data, ...)
 
     if (res_all) {
       return(result)
@@ -123,8 +124,18 @@ sigma_estim <-
     } else if (est_type == "LW-CC-SF") {
       result <- sigma_estim_lwcc_sf(data, param)
 
-    }else if (est_type == "AFM-LWNL") {
-      result <- sigma_estim_afm(data, factors, zeromean_log, sigma_estim_lwnl)
+    } else if (est_type == "LW-NONLIN-SF") {
+      result <-
+        sigma_estim_precond(data, zeromean_log, sigma_estim_lwnl, bandwidth_speed =
+                              param)
+
+    } else if (est_type == "GLASSO-SF") {
+      result <-
+        sigma_estim_precond(data, zeromean_log, sigma_estim_glasso_slim, rho = param)
+
+    } else if (est_type == "AFM-LWNL") {
+      result <-
+        sigma_estim_afm(data, factors, zeromean_log, sigma_estim_lwnl)
 
     }
 

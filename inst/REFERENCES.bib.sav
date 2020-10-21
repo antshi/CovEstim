@@ -1,0 +1,286 @@
+% Encoding: UTF-8
+﻿@article{jorion1986bayes,
+	title={Bayes-Stein estimation for portfolio analysis},
+	author={Jorion, Philippe},
+	journal={Journal of Financial and Quantitative analysis},
+	volume={21},
+	number={3},
+	pages={279--292},
+	year={1986},
+	publisher={Cambridge University Press}
+}
+
+@article{warton2008penalized,
+	title={Penalized normal likelihood and ridge regularization of correlation and covariance matrices},
+	author={Warton, David I},
+	journal={Journal of the American Statistical Association},
+	volume={103},
+	number={481},
+	pages={340--349},
+	year={2008},
+	publisher={Taylor \& Francis}
+}
+
+@Manual{corpcorpackage,
+	title = {corpcor: Efficient Estimation of Covariance and (Partial) Correlation},
+	author = {Juliane Schafer and Rainer Opgen-Rhein and Verena Zuber and Miika Ahdesmaki and A. Pedro Duarte Silva and Korbinian Strimmer.},
+	year = {2017},
+	note = {R package version 1.6.9},
+	url = {https://CRAN.R-project.org/package=corpcor},
+	}
+
+@Manual{matrixpackage,
+	title = {Matrix: Sparse and Dense Matrix Classes and Methods},
+	author = {Douglas Bates and Martin Maechler},
+	year = {2019},
+	note = {R package version 1.2-18},
+	url = {https://CRAN.R-project.org/package=Matrix},
+}
+
+@article{higham2002computing,
+  title={Computing the nearest correlation matrix—a problem from finance},
+  author={Higham, Nicholas J},
+  journal={IMA journal of Numerical Analysis},
+  volume={22},
+  number={3},
+  pages={329--343},
+  year={2002},
+  publisher={OUP}
+}
+
+@Manual{riskmetrics1996,
+  title={Riskmetrics technical document},
+  author={Morgan, JP},
+  year={1996},
+  publisher={New York}
+}
+
+@article{haff1991variational,
+  title={The variational form of certain Bayes estimators},
+  author={Haff, LR},
+  journal={The Annals of Statistics},
+  volume={19},
+  number={3},
+  pages={1163--1190},
+  year={1991},
+  publisher={Institute of Mathematical Statistics}
+}
+
+@inproceedings{stein1975estimation,
+  title={Estimation of a covariance matrix, Rietz Lecture},
+  author={Stein, Charles},
+  booktitle={39th Annual Meeting IMS, Atlanta, GA, 1975},
+  year={1975}
+}
+
+ @Manual{stcovpackage,
+    title = {stcov: Stein's Covariance Estimator},
+    author = {Brett Naul},
+    year = {2016},
+    note = {R package version 0.1.0},
+    url = {https://CRAN.R-project.org/package=stcov},
+  }
+
+@article{marvcenko1967distribution,
+  title={Distribution of eigenvalues for some sets of random matrices},
+  author={Mar{\v{c}}enko, Vladimir A and Pastur, Leonid Andreevich},
+  journal={Mathematics of the USSR-Sbornik},
+  volume={1},
+  number={4},
+  pages={457},
+  year={1967},
+  publisher={IOP Publishing}
+}
+
+@article{laloux1999,
+ author = {Laloux, Laurent and Cizeau, Pierre and Bouchaud, Jean-Philippe and Potters, Marc},
+ year = {1999},
+ title = {Noise dressing of financial correlation matrices},
+ pages = {1467--1470},
+ volume = {83},
+ number = {7},
+ no-issn = {0031-9007},
+ journal = {Physical Review Letters},
+ doi = {10.1103/PhysRevLett.83.1467}
+}
+
+@article{bouchaudpotters2009,
+  title={Financial applications of random matrix theory: a short review},
+  author={Bouchaud, Jean-Philippe and Potters, Marc},
+  journal={arXiv preprint arXiv:0910.1205},
+  year={2009}
+}
+
+@book{johnson2002applied,
+  title={Applied multivariate statistical analysis},
+  author={Johnson, Richard Arnold and Wichern, Dean W and others},
+  volume={5},
+  number={8},
+  year={2002},
+  publisher={Prentice hall Upper Saddle River, NJ}
+}
+
+@article{fan2016overview,
+  title={An overview of the estimation of large covariance and precision matrices},
+  author={Fan, Jianqing and Liao, Yuan and Liu, Han},
+  journal={The Econometrics Journal},
+  volume={19},
+  number={1},
+  pages={C1--C32},
+  year={2016},
+  publisher={Wiley Online Library}
+}
+
+@article{ledoit2018analytical,
+  title={Analytical nonlinear shrinkage of large-dimensional covariance matrices},
+  author={Ledoit, Olivier and Wolf, Michael},
+  journal={University of Zurich, Department of Economics, Working Paper},
+  number={264},
+  year={2018}
+}
+
+@article{ledoit2003identity,
+ author = {Ledoit, Olivier and Wolf, Michael},
+ year = {2003},
+ title = {Improved estimation of the covariance matrix of stock returns with an application to portfolio selection},
+ pages = {603--621},
+ volume = {10},
+ number = {5},
+ no-issn = {09275398},
+ journal = {Journal of Empirical Finance},
+ doi = {10.1016/S0927-5398(03)00007-0}
+}
+
+@article{ledoit2004oneparam,
+ author = {Ledoit, Olivier and Wolf, Michael},
+ year = {2004},
+ title = {A well-conditioned estimator for large-dimensional covariance matrices},
+ pages = {365--411},
+ volume = {88},
+ number = {2},
+ no-issn = {0047259X},
+ journal = {Journal of Multivariate Analysis},
+ doi = {10.1016/S0047-259X(03)00096-4}
+}
+
+@article{ledoit2004cc,
+ author = {Ledoit, Olivier and Wolf, Michael},
+ year = {2004},
+ title = {Honey, I shrunk the sample covariance matrix},
+ pages = {110--119},
+ volume = {30},
+ number = {4},
+ no-issn = {0095-4918},
+ journal = {Journal of Portfolio Management},
+ doi = {10.3905/jpm.2004.110}
+}
+
+@Manual{poetpackage,
+    title = {POET: Principal Orthogonal ComplEment Thresholding (POET) Method},
+    author = {Jianqing Fan and Yuan Liao and Martina Mincheva},
+    year = {2016},
+    note = {R package version 2.0},
+    url = {https://CRAN.R-project.org/package=POET},
+  }
+  
+@article{fan2013poet,
+ author = {Fan, Jianqing and Liao, Yuan and Mincheva, Martina},
+ year = {2013},
+ title = {Large covariance estimation by thresholding principal orthogonal complements},
+ pages = {603--680},
+ volume = {75},
+ number = {4},
+ no-issn = {1369-7412},
+ journal = {Journal of the Royal Statistical Society. Series B (Statistical Methodology)},
+ doi = {10.1111/rssb.12016}
+}
+
+@Manual{cvglassopackage,
+    title = {CVglasso: Lasso Penalized Precision Matrix Estimation},
+    author = {Matt Galloway},
+    year = {2018},
+    note = {R package version 1.0},
+    url = {https://CRAN.R-project.org/package=CVglasso},
+  }
+
+@Manual{glassopackage,
+    title = {glasso: Graphical Lasso: Estimation of Gaussian Graphical Models},
+    author = {Jerome Friedman and Trevor Hastie and Rob Tibshirani},
+    year = {2019},
+    note = {R package version 1.11},
+    url = {https://CRAN.R-project.org/package=glasso},
+  }
+  
+  @article{friedman2008sparse,
+  title={Sparse inverse covariance estimation with the graphical lasso},
+  author={Friedman, Jerome and Hastie, Trevor and Tibshirani, Robert},
+  journal={Biostatistics},
+  volume={9},
+  number={3},
+  pages={432--441},
+  year={2008},
+  publisher={Oxford University Press}
+}
+
+@article{torri2019sparse,
+  title={Sparse precision matrices for minimum variance portfolios},
+  author={Torri, Gabriele and Giacometti, Rosella and Paterlini, Sandra},
+  journal={Computational Management Science},
+  volume={16},
+  number={3},
+  pages={375--400},
+  year={2019},
+  publisher={Springer}
+}
+
+@article{finegold2011robust,
+  title={Robust graphical modeling of gene networks using classical and alternative t-distributions},
+  author={Finegold, Michael and Drton, Mathias},
+  journal={The Annals of Applied Statistics},
+  pages={1057--1080},
+  year={2011},
+  publisher={JSTOR}
+}
+
+@article{lam2016nonparametric,
+  title={Nonparametric eigenvalue-regularized precision or covariance matrix estimator},
+  author={Lam, Clifford and others},
+  journal={The Annals of Statistics},
+  volume={44},
+  number={3},
+  pages={928--953},
+  year={2016},
+  publisher={Institute of Mathematical Statistics}
+}
+
+@article{won2013condition,
+  title={Condition-number-regularized covariance estimation},
+  author={Won, Joong-Ho and Lim, Johan and Kim, Seung-Jean and Rajaratnam, Bala},
+  journal={Journal of the Royal Statistical Society: Series B (Statistical Methodology)},
+  volume={75},
+  number={3},
+  pages={427--450},
+  year={2013},
+  publisher={Wiley Online Library}
+}
+
+@Manual{condregpackage,
+    title = {CondReg: Condition Number Regularized Covariance Estimation},
+    author = {Sang-Yun Oh and Joong-Ho Won},
+    year = {2014},
+    note = {R package version 0.20},
+    url = {https://CRAN.R-project.org/package=CondReg},
+  }
+
+@article{li2019graphical,
+  title={The graphical horseshoe estimator for inverse covariance matrices},
+  author={Li, Yunfan and Craig, Bruce A and Bhadra, Anindya},
+  journal={Journal of Computational and Graphical Statistics},
+  volume={28},
+  number={3},
+  pages={747--757},
+  year={2019},
+  publisher={Taylor \& Francis}
+}
+
+@Comment{jabref-meta: databaseType:bibtex;}

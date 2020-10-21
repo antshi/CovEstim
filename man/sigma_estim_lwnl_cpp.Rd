@@ -10,7 +10,7 @@ sigma_estim_lwnl_cpp(data, bandwidth_speed = -1, zeromean_log = FALSE)
 \item{data}{an nxp data matrix.}
 
 \item{bandwidth_speed}{a double, indicating the speed at which the bandwidth vanishes in the number of variables p.
-Default value is -0.35.}
+Default value is -1/3.}
 
 \item{zeromean_log}{a logical, indicating whether the data matrix has zero means (TRUE) or not (FALSE). Default value is FALSE.}
 }
@@ -30,7 +30,7 @@ with the following formula:
 \deqn{\hat{\Sigma}=\Delta\hat{\Lambda}\Delta',}
 where \eqn{\Delta} is the matrix with the sample eigenvectors of the data matrix and \eqn{\hat{\Lambda}} is a diagonal matrix with the sample eigenvalues, shrunk in a nonlinear way.
 The optimal solution is achieved using a nonparametric variable bandwidth kernel estimation of the limiting spectral density of the sample eigenvalues and its Hilbert transform.
-The speed at which the bandwidth vanishes in the number of assets is set to -0.35.
+The speed at which the bandwidth vanishes in the number of assets is set to -1/3.
 A corresponding MATLAB code for the estimator can be accessed under \url{https://www.econ.uzh.ch/en/people/faculty/wolf/publications.html}.
 }
 \examples{

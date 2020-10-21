@@ -33,7 +33,9 @@ sigma_estim_lwident <-
            shrink_int = NULL,
            zeromean_log = FALSE) {
     data <- as.matrix(data)
+    names_data <- colnames(data)
     p <- dim(data)[2]
+    
     if (!zeromean_log) {
       centered <- apply(data, 2, function(x)
         x - mean(x))
@@ -42,11 +44,12 @@ sigma_estim_lwident <-
       centered <- data
       n <- dim(data)[1]
     }
-
+    rm(data)
+    gc()
+    
     sigma_sample <- t(centered) %*% centered / n
-
     sigma_target <- diag(1, p)
-
+    
     if (is.null(shrink_int)) {
       asyvar_mat <-
         t(centered ^ 2) %*% (centered ^ 2) / n - 2 * t(centered) %*% (centered) *
@@ -56,13 +59,13 @@ sigma_estim_lwident <-
       kappa <- asyvar / gamma
       shrink_int <- max(0, min(1, kappa / n))
     }
-
+    
     sigma_mat <-
       shrink_int * sigma_target + (1 - shrink_int) * sigma_sample
-
+    
     rownames(sigma_mat) <- colnames(data)
     colnames(sigma_mat) <- colnames(data)
-
+    
     return(list(sigma_mat, shrink_int))
   }
 
@@ -103,6 +106,7 @@ sigma_estim_lwone <-
            shrink_int = NULL,
            zeromean_log = FALSE) {
     data <- as.matrix(data)
+    names_data <- colnames(data)
     p <- dim(data)[2]
     if (!zeromean_log) {
       centered <- apply(data, 2, function(x)
@@ -112,12 +116,12 @@ sigma_estim_lwone <-
       centered <- data
       n <- dim(data)[1]
     }
-
+    rm(data)
+    gc()
+    
     sigma_sample <- t(centered) %*% centered / n
-
-    aver_var <- mean(diag(sigma_sample))
-    sigma_target <- aver_var * diag(1, p)
-
+    sigma_target <- mean(diag(sigma_sample)) * diag(1, p)
+    
     if (is.null(shrink_int)) {
       asyvar_mat <-
         t(centered ^ 2) %*% (centered ^ 2) / n - 2 * t(centered) %*% (centered) *
@@ -127,13 +131,13 @@ sigma_estim_lwone <-
       kappa <- asyvar / gamma
       shrink_int <- max(0, min(1, kappa / n))
     }
-
+    
     sigma_mat <-
       shrink_int * sigma_target + (1 - shrink_int) * sigma_sample
-
+    
     rownames(sigma_mat) <- colnames(data)
     colnames(sigma_mat) <- colnames(data)
-
+    
     return(list(sigma_mat, shrink_int))
   }
 
@@ -173,6 +177,7 @@ sigma_estim_lwcc <-
            shrink_int = NULL,
            zeromean_log = FALSE) {
     data <- as.matrix(data)
+    names_data <- colnames(data)
     p <- dim(data)[2]
     if (!zeromean_log) {
       centered <- apply(data, 2, function(x)
@@ -182,13 +187,14 @@ sigma_estim_lwcc <-
       centered <- data
       n <- dim(data)[1]
     }
-
+    rm(data)
+    gc()
     sigma_sample <- t(centered) %*% centered / n
-    corr_mat <- stats::cor(data)
+    corr_mat <- stats::cor(centered)
     rbar <- (sum(colSums(corr_mat)) - p) / (p * (p - 1))
     sigma_target <- rbar * sigma_sample / corr_mat
     diag(sigma_target) <- diag(sigma_sample)
-
+    
     if (is.null(shrink_int)) {
       asyvar_mat <-
         t(centered ^ 2) %*% (centered ^ 2) / n - 2 * t(centered) %*% (centered) *
@@ -212,12 +218,12 @@ sigma_estim_lwcc <-
       kappa <- (asyvar - rho) / gamma
       shrink_int <- max(0, min(1, kappa / n))
     }
-
+    
     sigma_mat <-
       shrink_int * sigma_target + (1 - shrink_int) * sigma_sample
-
-    rownames(sigma_mat) <- colnames(data)
-    colnames(sigma_mat) <- colnames(data)
-
+    
+    rownames(sigma_mat) <- names_data
+    colnames(sigma_mat) <- names_data
+    
     return(list(sigma_mat, shrink_int))
   }

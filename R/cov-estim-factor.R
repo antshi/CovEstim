@@ -34,7 +34,9 @@ sigma_estim_lwcc_sf <-
            shrink_int = NULL,
            zeromean_log = FALSE) {
     data <- as.matrix(data)
+    names_data <- colnames(data)
     p <- dim(data)[2]
+
     if (!zeromean_log) {
       centered <- apply(data, 2, function(x)
         x - mean(x))
@@ -44,6 +46,8 @@ sigma_estim_lwcc_sf <-
     factors <- rowMeans(centered)
 
     data_all <- cbind(data, factors)
+    rm(data)
+    gc()
     if (!zeromean_log) {
       centered_all <- apply(data_all, 2, function(x)
         x - mean(x))
@@ -89,8 +93,8 @@ sigma_estim_lwcc_sf <-
     sigma_mat <-
       shrink_int * sigma_target + (1 - shrink_int) * sigma_sample
 
-    rownames(sigma_mat) <- colnames(data)
-    colnames(sigma_mat) <- colnames(data)
+    rownames(sigma_mat) <- names_data
+    colnames(sigma_mat) <- names_data
 
     return(list(sigma_mat, shrink_int))
 
@@ -125,24 +129,28 @@ sigma_estim_efm <- function(data,
                             factors = NULL,
                             zeromean_log = FALSE) {
   data <- as.matrix(data)
+  names_data <- colnames(data)
   if (is.null(factors)) {
     if (!zeromean_log) {
-      centered <- apply(data, 2, function(x)
-        x - mean(x))
+      factors <- as.matrix(rowMeans(apply(data, 2, function(x)
+        x - mean(x))))
     } else{
-      centered <- data
+      factors <- as.matrix(rowMeans(data))
     }
-    factors <- as.matrix(rowMeans(centered))
   }
   sigma_factors <-
     stats::var(factors, use = "pairwise", na.rm = TRUE)
   fm <- stats::lm(data ~ factors - 1)
+  rm(data, factors)
+  gc()
   factor_betas <- t(fm$coefficients)
-  factor_res <- fm$residuals
-  sigma_res <- diag(diag(stats::var(factor_res)))
+  sigma_res <- diag(diag(stats::var(fm$residuals)))
   sigma_fm <-
     as.matrix(factor_betas %*% sigma_factors %*% t(factor_betas))
   sigma_mat <-  as.matrix(sigma_fm + sigma_res)
+
+  colnames(sigma_mat) <- names_data
+  rownames(sigma_mat) <- names_data
 
   return(list(sigma_mat, NA))
 }
@@ -154,8 +162,8 @@ sigma_estim_efm <- function(data,
 #' @param data an nxp data matrix.
 #' @param factors a nxf matrix with factors. Default value is NULL and the factor is equal to the cross-sectional average of all the variables in the data.
 #' @param zeromean_log a logical, indicating whether the data matrix has zero means (TRUE) or not (FALSE). Default value is FALSE.
-#' @param estim_func a covariance estimation function, applied to the residuals covariance matrix.
-#' @param ... further arguments to be parsed to estim_func.
+#' @param resid_est_func a covariance estimation function, applied to the residuals covariance matrix.
+#' @param ... further arguments to be parsed to resid_est_func
 #' @return a list with the following entries
 #' \itemize{
 #' \item a pxp estimated covariance matrix.
@@ -169,8 +177,8 @@ sigma_estim_efm <- function(data,
 #' @examples
 #' data(sp200)
 #' sp_rets <- sp200[,-1]
-#' sigma_afm <- sigma_estim_afm(sp_rets, resid_estim_func=sigma_estim_lwnl)[[1]]
-#' results_afm <- sigma_estim_afm(sp_rets, resid_estim_func=sigma_estim_lwone, shrink_int=0.1)
+#' sigma_afm <- sigma_estim_afm(sp_rets, resid_est_func=sigma_estim_lwnl)[[1]]
+#' results_afm <- sigma_estim_afm(sp_rets, resid_est_func=sigma_estim_lwone, shrink_int=0.1)
 #' sigma_afm <- results_afm[[1]]
 #' param_afm <- results_afm[[2]]
 #'
@@ -180,69 +188,96 @@ sigma_estim_afm <-
   function(data,
            factors = NULL,
            zeromean_log = FALSE,
-           resid_estim_func,
+           resid_est_func,
            ...) {
     data <- as.matrix(data)
-
+    names_data <- colnames(data)
     if (is.null(factors)) {
       if (!zeromean_log) {
-        centered <- apply(data, 2, function(x)
-          x - mean(x))
+        factors <- as.matrix(rowMeans(apply(data, 2, function(x)
+          x - mean(x))))
       } else{
-        centered <- data
+        factors <- as.matrix(rowMeans(data))
       }
-      factors <- as.matrix(rowMeans(centered))
     }
 
     sigma_factors <-
       stats::var(factors, use = "pairwise", na.rm = TRUE)
     fm <- stats::lm(data ~ factors - 1)
-    factor_betas <- t(fm$coefficients)
-    factor_res <- fm$residuals
-    sigma_fm <- factor_betas %*% sigma_factors %*% t(factor_betas)
+    rm(data, factors)
+    gc()
+    sigma_fm <-
+      t(fm$coefficients) %*% sigma_factors %*% t(t(fm$coefficients))
     res_estim <-
-      sigma_estim_wrapper(factor_res, res_all = TRUE, resid_estim_func, ...)
+      sigma_estim_wrapper(fm$residuals, res_all = TRUE, resid_est_func, ...)
     sigma_res <- res_estim[[1]]
     param_res <- res_estim[[2]]
 
     sigma_mat <- as.matrix(sigma_fm + sigma_res)
 
-    rownames(sigma_mat) <- colnames(data)
-    colnames(sigma_mat) <- colnames(data)
+    rownames(sigma_mat) <- names_data
+    colnames(sigma_mat) <- names_data
 
     return(list(sigma_mat, param_res))
 
   }
 
-# sigma_estim_efm_adj <-
-#   function(data,
-#            factors = NULL,
-#            zeromean_log = FALSE,
-#            estim_func,
-#            ...) {
-#     data <- as.matrix(data)
-#     if (is.null(factors)) {
-#       if (!zeromean_log) {
-#         centered <- apply(data, 2, function(x)
-#           x - mean(x))
-#       } else{
-#         centered <- data
-#       }
-#       factors <- as.matrix(rowMeans(centered))
-#     }
-#     sigma_efm <- sigma_estim_efm(data, factors)
-#     sigma_efm_sqrt <- sqrt_root_calc(sigma_efm)
-#     data_adj <- data %*% solve(sigma_efm_sqrt)
-#     res_estim_adj <- sigma_estim_wrapper(data_adj, estim_func, ...)
-#     sigma_estim_adj <- res_estim_adj[[1]]
-#     param_estim_adj <- res_estim_adj[[2]]
-#
-#     sigma_mat <-
-#       as.matrix(sigma_efm_sqrt %*% sigma_estim_adj %*% sigma_efm_sqrt)
-#
-#     rownames(sigma_mat) <- colnames(data)
-#     colnames(sigma_mat) <- colnames(data)
-#
-#     return(list(sigma_mat, param_estim_adj))
-#
-#   }
+#' Covariance Estimation - Preconditioned
+#'
+#' Computes a specific estimator of the covariance matrix after preconditioning
+#' the data with a single factor model - the implicit market portfolio.
+#'
+#' @param data an nxp data matrix.
+#' @param zeromean_log a logical, indicating whether the data matrix has zero means (TRUE) or not (FALSE). Default value is FALSE.
+#' @param precond_est_func a function for estimating the precondtioned covariance matrix.
+#' @param ... further arguments to be parsed to precond_est_func.
+#'
+#' @return a list with the following entries
+#' \itemize{
+#' \item a pxp estimated covariance matrix.
+#' \item an estimation specific tuning parameter, here the bandwidth speed.
+#' }
+#'
+#' @examples
+#' data(sp200)
+#' sp_rets <- sp200[,-1]
+#' sigma_lwnl_sf <- sigma_estim_precond(sp_rets,
+#' precond_est_func=sigma_estim_lwnl, bandwidth_speed=NULL)[[1]]
+#' sigma_glasso_sf <- sigma_estim_precond(sp_rets,
+#' precond_est_func=sigma_estim_glasso, rho=0.01)[[1]]
+#'
+#' @importFrom Rdpack reprompt
+#' @references
+#'\insertAllCited
+#'
+#' @export sigma_estim_precond
+#'
+sigma_estim_precond <-
+  function(data,
+           zeromean_log = FALSE,
+           precond_est_func = NULL,
+           ...) {
+    data <- as.matrix(data)
+    names_data <- colnames(data)
+
+    sqrt_sigma_mat_fm <-
+      sqrt_root_calc(sigma_estim_efm(data, zeromean_log = zeromean_log)[[1]])
+    data_precond <- data %*% solve(sqrt_sigma_mat_fm)
+    rm(data)
+    gc()
+    results_precond <-
+      sigma_estim_wrapper(data = data_precond,
+                          est_func = precond_est_func,
+                          res_all = TRUE,
+                          ...)
+    sigma_mat_precond <- results_precond[[1]]
+    param_precond <- results_precond[[2]]
+
+    sigma_mat <-
+      sqrt_sigma_mat_fm %*% sigma_mat_precond %*% sqrt_sigma_mat_fm
+
+    rownames(sigma_mat) <- names_data
+    colnames(sigma_mat) <- names_data
+
+    return(list(sigma_mat, param_precond))
+  }

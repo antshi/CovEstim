@@ -24,9 +24,8 @@
 #' @references
 #'\insertAllCited
 #'
-#' @export sigma_estim_glasso
+#' @export sigma_estim_ghs
 #'
-
 sigma_estim_ghs <- function(data, burnin = 100, nmc = 5000) {
   data <- as.matrix(data)
   n <- dim(data)[1]

@@ -7,8 +7,6 @@
 sigma_estim_glasso(
   data,
   rho = NULL,
-  rho_len = 100,
-  rho_seq_min_ratio = 0.001,
   type = "cor",
   nfolds = 5,
   crit = "loglik",
@@ -26,10 +24,6 @@ sigma_estim_glasso(
 \item{rho}{a double or a sequence, the non-negative regularization parameter \eqn{\rho} for lasso. \eqn{\rho=0} means no regularization.
 Can be a scalar (usual) or a symmetric p by p matrix, or a vector of length p. In the latter case, the penalty matrix has jkth element \eqn{\sqrt{\rho_j*\rho_k}}. Default value is NULL
 and an optimal regularization is computed with the cross-validation (CV) procedure as in \insertCite{cvglassopackage;textual}{CovEstim}.}
-
-\item{rho_len}{an integer, indicating the length for setting the rho sequence.}
-
-\item{rho_seq_min_ratio}{a double, the minimum ratio for deviation between the rho values in the sequence.}
 
 \item{type}{a character, the type of matrix to be estimated. Possible values are c("cor", "cov"). Default value is "cor" for the correlation matrix.}
 

@@ -22,14 +22,14 @@
 #'
 sigma_estim_sample <- function(data) {
   data <- as.matrix(data)
+  names_data <- colnames(data)
   n <- dim(data)[1]
-
   centered <- apply(data, 2, function(x)
     x - mean(x))
   sigma_mat <- t(centered) %*% centered / (n - 1)
 
-  rownames(sigma_mat) <- colnames(data)
-  colnames(sigma_mat) <- colnames(data)
+  rownames(sigma_mat) <- names_data
+  colnames(sigma_mat) <- names_data
 
   return(list(sigma_mat, NA))
 }
@@ -59,14 +59,14 @@ sigma_estim_sample <- function(data) {
 #'
 sigma_estim_ml <- function(data) {
   data <- as.matrix(data)
+  names_data <- colnames(data)
   n <- dim(data)[1]
-
   centered <- apply(data, 2, function(x)
     x - mean(x))
   sigma_mat <- t(centered) %*% centered / n
 
-  rownames(sigma_mat) <- colnames(data)
-  colnames(sigma_mat) <- colnames(data)
+  rownames(sigma_mat) <- names_data
+  colnames(sigma_mat) <- names_data
 
   return(list(sigma_mat, NA))
 }
@@ -98,16 +98,19 @@ sigma_estim_ml <- function(data) {
 #'
 sigma_estim_bs <- function(data) {
   data <- as.matrix(data)
+  names_data <- colnames(data)
   n <- dim(data)[1]
   p <- dim(data)[2]
+  mu <- colMeans(data)
   centered <- apply(data, 2, function(x)
     x - mean(x))
+  rm(data)
+  gc()
   sigma_ml <- t(centered) %*% centered / n
   sigma_ml_inv <- solve(sigma_ml)
   sigma <- sigma_ml * (n / (n - p - 2))
   sigma_inv <- solve(sigma)
 
-  mu <- colMeans(data)
   ones <- rep.int(1, p)
   mug <-
     as.numeric(ones %*% sigma_ml_inv %*% mu / as.numeric(ones %*% sigma_ml_inv %*%
@@ -120,8 +123,8 @@ sigma_estim_bs <- function(data) {
     (1 + 1 / (n + lambda)) * sigma + (lambda / (n * (n + 1 + lambda))) * (ones %*%
                                                                             t(ones)) / as.numeric(ones %*% sigma_inv %*% ones)
 
-  rownames(sigma_mat) <- colnames(data)
-  colnames(sigma_mat) <- colnames(data)
+  rownames(sigma_mat) <- names_data
+  colnames(sigma_mat) <- names_data
 
   return(list(sigma_mat, NA))
 }

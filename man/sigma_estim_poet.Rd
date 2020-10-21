@@ -4,7 +4,7 @@
 \alias{sigma_estim_poet}
 \title{Principal Orthogonal ComplEment Thresholding (POET) Covariance Estimation}
 \usage{
-sigma_estim_poet(data, K = NULL, C = NULL, thres = "soft", matrix = "vad")
+sigma_estim_poet(data, K = NULL, C = 1, thres = "soft", matrix = "vad")
 }
 \arguments{
 \item{data}{an nxp data matrix.}
@@ -13,7 +13,7 @@ sigma_estim_poet(data, K = NULL, C = NULL, thres = "soft", matrix = "vad")
 Default values is NULL and the optimal K is calculated as in \insertCite{poetpackage;textual}{CovEstim}.
 K=0 corresponds to threshoding the sample covariance directly.}
 
-\item{C}{a double, the positive constant for thresholding. Default value is NULL and the optimal K is calculated as in \insertCite{poetpackage;textual}{CovEstim}.}
+\item{C}{a double, the positive constant for thresholding. Default value is 1.}
 
 \item{thres}{a character, indicating the choice of thresholding. Possible values are "soft" for soft-thresholding, "hard" for hard thresholding and
 "scad" for scad thresholding. Default is "soft".}

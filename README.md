@@ -70,7 +70,7 @@ Maximum-Likelihood Estimator
 ```r
 sigma_ml <- sigma_estim_ml(sp_rets)[[1]]
 
-sigma_ml <- sigma_estim_wrapper(sp_rets, estim_func=sigma_estim_ml)
+sigma_ml <- sigma_estim_wrapper(sp_rets, est_func=sigma_estim_ml)
 
 sigma_ml <- sigma_estim(sp_rets, est_type="ML")
 
@@ -112,7 +112,7 @@ str(sigma_lwcc_results)
 Some more complicated application would be the Approximate Factor Model with a nonlinear shrinkage estimation on the covariance matrix of residuals
 
 ```r
-sigma_afm_lwnl_results <- sigma_estim_wrapper(sp_rets, estim_func = sigma_estim_afm, resid_estim_func=sigma_estim_lwnl)
+sigma_afm_lwnl_results <- sigma_estim_wrapper(sp_rets, est_func = sigma_estim_afm, resid_est_func=sigma_estim_lwnl)
 str(sigma_afm_lwnl_results)
 ```
 ### Example 5

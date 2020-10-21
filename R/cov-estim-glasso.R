@@ -1,14 +1,56 @@
+#' Graphical Lasso (GLASSO) Covariance Estimation - the slim (correlation) version
+#'
+#' Computes the GLASSO estimator of the covariance matrix.
+#'
+#' @param data an nxp data matrix.
+#' @param rho a double, the non-negative regularization parameter \eqn{\rho} for the lasso penalty.
+#'
+#' @return a list with the following entries
+#' \itemize{
+#' \item a pxp estimated covariance matrix.
+#' \item an estimation specific tuning parameter, here the lasso penalty.
+#' }
+#'
+#' @details The GLASSO estimator is elaborated in detail in \insertCite{friedman2008sparse;textual}{CovEstim}. More information on the functionality can be found in
+#' \insertCite{glassopackage;textual}{CovEstim} and \insertCite{cvglassopackage;textual}{CovEstim}.
+#'
+#'
+#' @examples
+#' data(sp200)
+#' sp_rets <- sp200[,-1]
+#' sigma_glasso <- sigma_estim_glasso_slim(sp_rets, rho=0.01)[[1]]
+#'
+#' @import huge
+#' @importFrom Rdpack reprompt
+#' @references
+#'\insertAllCited
+#'
+#' @export sigma_estim_glasso_slim
+#'
+sigma_estim_glasso_slim <-
+  function(data, rho = NULL, type = "cor") {
+    data <- as.matrix(data)
+    names_data <- colnames(data)
+    corr_glasso <-
+        solve(huge::huge.glasso(
+          stats::cor(data),
+          lambda = rho,
+          scr = TRUE,
+          verbose = FALSE
+        )$icov[[1]])
+
+    return(list(corr_glasso, rho))
+  }
+
 #' Graphical Lasso (GLASSO) Covariance Estimation
 #'
 #' Computes the GLASSO estimator of the covariance matrix.
 #'
 #' @param data an nxp data matrix.
-#' @param type a character, the type of matrix to be estimated. Possible values are c("cor", "cov"). Default value is "cor" for the correlation matrix.
 #' @param rho a double or a sequence, the non-negative regularization parameter \eqn{\rho} for lasso. \eqn{\rho=0} means no regularization.
 #' Can be a scalar (usual) or a symmetric p by p matrix, or a vector of length p. In the latter case, the penalty matrix has jkth element \eqn{\sqrt{\rho_j*\rho_k}}. Default value is NULL
 #' and an optimal regularization is computed with the cross-validation (CV) procedure as in \insertCite{cvglassopackage;textual}{CovEstim}.
-#' @param rho_len an integer, indicating the length for setting the rho sequence.
-#' @param rho_seq_min_ratio a double, the minimum ratio for deviation between the rho values in the sequence.
+#' @param type a character, the type of matrix to be estimated. Possible values are c("cor", "cov"). Default value is "cor" for the correlation matrix.
 #' @param nfolds an integer, indicating the number of folds for the CV. Default value is 5.
 #' @param crit a character, indicating which selection criterion within the CV. Possible values are "loglik", "AIC" and "BIC". Default is set to "BIC".
 #' @param pendiag_log a logical, indicating whether the diagonal of the sample covariance matrix is to be penalized (TRUE) or not (FALSE). Default value is FALSE.
@@ -35,6 +77,7 @@
 #'
 #' @import glasso
 #' @import CVglasso
+#' @import parallel
 #' @import doParallel
 #' @import foreach
 #' @importFrom Rdpack reprompt
@@ -46,8 +89,6 @@
 sigma_estim_glasso <-
   function(data,
            rho = NULL,
-           rho_len = 100,
-           rho_seq_min_ratio = 0.001,
            type = "cor",
            nfolds = 5,
            crit = "loglik",
@@ -58,20 +99,20 @@ sigma_estim_glasso <-
            cores = 1,
            seed = 1234) {
     data <- as.matrix(data)
+    names_data <- colnames(data)
 
     if (type == "cov") {
-      n <- dim(data)[1]
-      centered <- apply(data, 2, function(x)
-        x - mean(x))
-      sigma_sample <- t(centered) %*% centered / (n - 1)
+      sigma_sample <- stats::var(data, na.rm = TRUE)
 
       if (is.null(rho)) {
         sigma_sample_diag0 <- sigma_sample
         diag(sigma_sample_diag0) <- 0
         rho_max <- max(abs(sigma_sample_diag0))
-        rho_min <- rho_seq_min_ratio * rho_max
+        rho_min <- 0.001 * rho_max
         rho <-
-          10 ^ seq(log10(rho_min), log10(rho_max), length = rho_len)
+          10 ^ seq(log10(rho_min), log10(rho_max), length = 100)
+        rm(data, sigma_sample, sigma_sample_diag0)
+        gc()
       }
       results <-
         CVglasso::CVglasso(
@@ -86,17 +127,21 @@ sigma_estim_glasso <-
           cores = cores,
           trace = "none"
         )
-        rho <- results$Tuning[2]
-        sigma_mat <- results$Sigma
-        rownames(sigma_mat) <- colnames(data)
-        colnames(sigma_mat) <- colnames(data)
-        
+      rho <- results$Tuning[2]
+      sigma_mat <- results$Sigma
+      rownames(sigma_mat) <- names_data
+      colnames(sigma_mat) <- names_data
+
     } else if (type == "cor") {
+      if (is.null(rho)) {
+        rho = sort(exp(seq(log(1 / 100), log(1), length.out = 100)))
+
+      }
+
       results <-
         CVglasso_mod(
           X = data,
           lam = rho,
-          nlam = rho_len,
           seed = seed,
           K = nfolds,
           crit.cv = crit,
@@ -106,19 +151,17 @@ sigma_estim_glasso <-
           cores = cores,
           trace = "none"
         )
-        
-        rho <- results$Tuning[2]
-        
-        vola_mat <- diag(apply(data, 2, stats::sd, na.rm = TRUE))
-        sigma_mat <- vola_mat%*%results$Sigma%*%vola_mat
-        
-        rownames(sigma_mat) <- colnames(data)
-        colnames(sigma_mat) <- colnames(data)
+
+      rho <- results$Tuning[2]
+      vola_mat <- diag(apply(data, 2, stats::sd, na.rm = TRUE))
+      sigma_mat <- vola_mat %*% results$Sigma %*% vola_mat
+
+      rownames(sigma_mat) <- names_data
+      colnames(sigma_mat) <- names_data
 
     } else{
       stop("Type not recognized. Please, enter either cov or cor.")
     }
-
 
     return(list(sigma_mat, rho))
 
@@ -127,7 +170,6 @@ sigma_estim_glasso <-
 
 CVglasso_mod = function(X = NULL,
                         lam = NULL,
-                        nlam = 50,
                         seed = 1234,
                         path = FALSE,
                         tol = 1e-04,
@@ -144,13 +186,13 @@ CVglasso_mod = function(X = NULL,
   if (!all(lam > 0)) {
     stop("lam must be positive!")
   }
-  if (!(all(c(tol, maxit, adjmaxit, K, cores, nlam) > 0))) {
+  if (!(all(c(tol, maxit, adjmaxit, K, cores) > 0))) {
     stop("Entry must be positive!")
   }
-  if (!(all(sapply(
-    c(tol, maxit, adjmaxit, K, cores, nlam),
-    length
-  ) <= 1))) {
+  if (!(all(sapply(c(
+    tol, maxit, adjmaxit, K, cores
+  ),
+  length) <= 1))) {
     stop("Entry must be single value!")
   }
   if (all(c(maxit, adjmaxit, K, cores) %% 1 != 0)) {
@@ -189,7 +231,7 @@ CVglasso_mod = function(X = NULL,
 
   # compute grid of lam values, if necessary
   if (is.null(lam)) {
-    lam = sort(exp(seq(log(1 / nlam), log(1), length.out = nlam)))
+    lam = sort(exp(seq(log(1 / 100), log(1), length.out = 100)))
 
   } else {
     # sort lambda values
@@ -324,7 +366,7 @@ CVglasso_mod = function(X = NULL,
 }
 
 CV_mod = function(X = NULL,
-                  lam = exp(seq(log(1 / 100), log(1), length.out = 100)),
+                  lam = NULL,
                   seed = 1234,
                   path = FALSE,
                   tol = 1e-04,
@@ -390,7 +432,8 @@ CV_mod = function(X = NULL,
       C.valid = stats::cor(X.valid)
 
     }
-
+    rm(X.valid, X.train, X_bar)
+    gc()
 
     # re-initialize values for each fold
     maxit = initmaxit
@@ -504,7 +547,7 @@ CVP_mod = function(X = NULL,
   lam = sort(lam)
 
   # make cluster and register cluster
-  num_cores = parallel:::detectCores()
+  num_cores = parallel::detectCores()
   if (cores > num_cores) {
     cat("\nOnly detected", paste(num_cores, "cores...", sep = " "))
   }

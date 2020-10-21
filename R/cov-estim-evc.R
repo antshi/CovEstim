@@ -23,6 +23,7 @@
 #'
 sigma_estim_sh <- function(data) {
   data <- as.matrix(data)
+  names_data <- colnames(data)
   n <- dim(data)[1]
   p <- dim(data)[2]
   centered <- apply(data, 2, function(x)
@@ -31,6 +32,8 @@ sigma_estim_sh <- function(data) {
   eigen_tmp <- eigen(sigma_sample)
   eigenval <- eigen_tmp$values
   eigenvec <- eigen_tmp$vectors
+  rm(data, centered, sigma_sample, eigen_tmp)
+  gc()
   k <- min(n, p)
   eigenval_subset <- eigenval[1:k]
   eigenval_sumdiffs <-
@@ -49,8 +52,8 @@ sigma_estim_sh <- function(data) {
 
   sigma_mat <- eigenvec %*% diag(eigenval_haff) %*% t(eigenvec)
 
-  rownames(sigma_mat) <- colnames(data)
-  colnames(sigma_mat) <- colnames(data)
+  rownames(sigma_mat) <- names_data
+  colnames(sigma_mat) <- names_data
 
   return(list(sigma_mat, NA))
 }
@@ -87,6 +90,7 @@ sigma_estim_sh <- function(data) {
 #'
 sigma_estim_evc_mp <- function(data) {
   data <- as.matrix(data)
+  names_data <- colnames(data)
   n <- dim(data)[1]
   p <- dim(data)[2]
   vola_mat <- diag(apply(data, 2, stats::sd, na.rm = TRUE))
@@ -94,21 +98,24 @@ sigma_estim_evc_mp <- function(data) {
   eigen_tmp <- eigen(corr_mat)
   eigenval <- eigen_tmp$values
   eigenvec <- eigen_tmp$vectors
+  rm(data, corr_mat, eigen_tmp)
+  gc()
   meanvar <- mean(eigenval)
   lambdamax <- meanvar * ((1 + sqrt(p / n)) ^ 2)
   index <- which(eigenval < lambdamax)
   eigenval_aver <- mean(eigenval[index])
   eigenval_rmt <- eigenval
   eigenval_rmt[index] <- eigenval_aver
+  cut_edge <- 1 - index[1]/p
 
   corr_mat_rmt <- eigenvec %*% diag(eigenval_rmt) %*% t(eigenvec)
 
   sigma_mat <- as.matrix(vola_mat %*% corr_mat_rmt %*% vola_mat)
 
-  rownames(sigma_mat) <- colnames(data)
-  colnames(sigma_mat) <- colnames(data)
+  rownames(sigma_mat) <- names_data
+  colnames(sigma_mat) <- names_data
 
-  return(list(sigma_mat, NA))
+  return(list(sigma_mat, cut_edge))
 }
 
 #'  Eigenvalue Clipping Covariance Estimation (Bouchaud-Potters)
@@ -142,12 +149,14 @@ sigma_estim_evc_mp <- function(data) {
 #'
 sigma_estim_evc_bp <- function(data, cut_edge) {
   data <- as.matrix(data)
+  names_data <- colnames(data)
   p <- dim(data)[2]
   vola_mat <- diag(apply(data, 2, stats::sd, na.rm = TRUE))
   corr_mat <- stats::cor(data)
   eigen_tmp <- eigen(corr_mat)
   eigenval <-  eigen_tmp$values
   eigenvec <- eigen_tmp$vectors
+  rm(data, corr_mat, eigen_tmp)
 
   keep_edge <- (1 - cut_edge) * p
   if (keep_edge == 0) {
@@ -162,8 +171,8 @@ sigma_estim_evc_bp <- function(data, cut_edge) {
   corr_mat_rmt <- eigenvec %*% diag(eigenval_rmt) %*% t(eigenvec)
   sigma_mat <- as.matrix(vola_mat %*% corr_mat_rmt %*% vola_mat)
 
-  rownames(sigma_mat) <- colnames(data)
-  colnames(sigma_mat) <- colnames(data)
+  rownames(sigma_mat) <- names_data
+  colnames(sigma_mat) <- names_data
 
   return(list(sigma_mat, cut_edge))
 }
@@ -198,12 +207,13 @@ sigma_estim_evc_bp <- function(data, cut_edge) {
 #'
 sigma_estim_pca <- function(data, number_pc = NULL) {
   data <- as.matrix(data)
+  names_data <- colnames(data)
+  n <- dim(data)[1]
+  p <- dim(data)[2]
   centered <- apply(data, 2, function(x)
     x - mean(x))
-  centered_t <- t(centered)
-  p <- dim(centered_t)[1]
-  n <- dim(centered_t)[2]
-
+rm(data)
+gc()
   if (is.null(number_pc)) {
     corr_mat <- stats::cor(centered)
     cor_eigen_tmp <- eigen(corr_mat)
@@ -218,21 +228,21 @@ sigma_estim_pca <- function(data, number_pc = NULL) {
   }
 
   if (number_pc != 0) {
-    eigen_tmp <- eigen(t(centered_t) %*% centered_t)
-    eigenvec <- eigen_tmp$vectors
+    centered_t <- t(centered)
+    eigenvec <- eigen(t(centered_t) %*% centered_t)$vectors
     fac_pca <- sqrt(n) * eigenvec[, 1:number_pc]
     lam_pca <- centered_t %*% fac_pca / n
     uhat <-  centered_t - lam_pca %*% t(fac_pca)
     low_rank <- lam_pca %*% t(lam_pca)
     su_pca <- uhat %*% t(uhat) / n
     su_diag <- diag(diag(su_pca))
-
     sigma_mat <- low_rank + su_diag
   } else{
     sigma_mat <- diag(1, p)
   }
-  rownames(sigma_mat) <- colnames(data)
-  colnames(sigma_mat) <- colnames(data)
+  
+  rownames(sigma_mat) <- names_data
+  colnames(sigma_mat) <- names_data
 
   return(list(sigma_mat, number_pc))
 

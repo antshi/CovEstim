@@ -79,6 +79,8 @@ make_posdef <- function(mat, tol = 1e-8) {
   eigen_tmp <- eigen(mat, symmetric = TRUE)
   eigenval <- eigen_tmp$values
   eigenvec <- eigen_tmp$vectors
+  rm(eigen_tmp)
+  gc()
   if (is.null(tol)) {
     tol <- p * max(abs(eigenval)) * .Machine$double.eps
   }

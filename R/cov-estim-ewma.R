@@ -28,9 +28,12 @@
 #'
 sigma_estim_ewma <- function(data, lambda = 0.97) {
     data <- as.matrix(data)
+    names_data <- colnames(data)
     centered <- apply(data, 2, function(x)
         x - mean(x))
     n <- dim(centered)[1]
+    rm(data)
+    gc()
 
     for (i.e in seq_len(n)) {
         if (i.e == 1) {
@@ -41,8 +44,8 @@ sigma_estim_ewma <- function(data, lambda = 0.97) {
         }
     }
 
-    rownames(sigma_mat) <- colnames(data)
-    colnames(sigma_mat) <- colnames(data)
+    rownames(sigma_mat) <- names_data
+    colnames(sigma_mat) <- names_data
 
     return(list(sigma_mat, lambda))
 }

@@ -4,7 +4,7 @@
 #'
 #' @param data an nxp data matrix.
 #' @param bandwidth_speed a double, indicating the speed at which the bandwidth vanishes in the number of variables p.
-#' Default value is -0.35.
+#' Default value is -1/3.
 #' @param zeromean_log a logical, indicating whether the data matrix has zero means (TRUE) or not (FALSE). Default value is FALSE.
 #' @return a list with the following entries
 #' \itemize{
@@ -17,7 +17,7 @@
 #' \deqn{\hat{\Sigma}=\Delta\hat{\Lambda}\Delta',}
 #' where \eqn{\Delta} is the matrix with the sample eigenvectors of the data matrix and \eqn{\hat{\Lambda}} is a diagonal matrix with the sample eigenvalues, shrunk in a nonlinear way.
 #' The optimal solution is achieved using a nonparametric variable bandwidth kernel estimation of the limiting spectral density of the sample eigenvalues and its Hilbert transform.
-#' The speed at which the bandwidth vanishes in the number of assets is set to -0.35.
+#' The speed at which the bandwidth vanishes in the number of assets is set to -1/3.
 #' A corresponding MATLAB code for the estimator can be accessed under \url{https://www.econ.uzh.ch/en/people/faculty/wolf/publications.html}.
 #'
 #' @examples
@@ -36,6 +36,7 @@ sigma_estim_lwnl <-
            bandwidth_speed = NULL,
            zeromean_log = FALSE) {
     data <- as.matrix(data)
+    names_data <- colnames(data)
     p <- dim(data)[2]
     if (!zeromean_log) {
       centered <- apply(data, 2, function(x)
@@ -45,21 +46,18 @@ sigma_estim_lwnl <-
       centered <- data
       n <- dim(data)[1]
     }
-
     sigma_ml <- t(centered) %*% centered / n
-
     eigen_tmp <- eigen(sigma_ml)
-    eigenval <- eigen_tmp$values
-    eigenvec <- eigen_tmp$vectors
-    eigenval_sort <- sort(eigenval, index.return = TRUE)$x
-    eigenvec_sort <-
-      eigenvec[, sort(eigenval, index.return = TRUE)$ix]
+    sort_eigenval <- sort(eigen_tmp$values, index.return = TRUE)
+    eigenval_sort <- sort_eigenval$x
+    eigenvec_sort <- eigen_tmp$vectors[, sort_eigenval$ix]
+    rm(data, centered, sigma_ml, eigen_tmp)
+    gc()
     lambda <- as.matrix(eigenval_sort[max(1, p - n + 1):p])
-    ident_mat <-
-      matrix(rep.int(1, min(p, n) * 1), nrow = 1, ncol = min(p, n))
-    lambda_mat <- kronecker(ident_mat, lambda)
-    if(is.null(bandwidth_speed)){
-        bandwidth_speed <- -0.35
+    lambda_mat <-
+      kronecker(matrix(rep.int(1, min(p, n) * 1), nrow = 1, ncol = min(p, n)), lambda)
+    if (is.null(bandwidth_speed)) {
+      bandwidth_speed <- -1 / 3
     }
     h <- n ^ (bandwidth_speed)
     h_mat <- h * t(lambda_mat)
@@ -71,7 +69,7 @@ sigma_estim_lwnl <-
     hf_temp[abs(x) == sqrt(5)] <-
       (-3 / 10 / pi) * x[abs(x) == sqrt(5)]
     hf_tilde <- rowMeans(hf_temp / h_mat)
-
+    
     if (p <= n) {
       dtilde <-
         lambda / (((pi * (p / n) * lambda * f_tilde) ^ 2) + ((1 - (p / n) - pi *
@@ -84,12 +82,12 @@ sigma_estim_lwnl <-
         lambda / ((pi ^ 2) * (lambda ^ 2) * (((f_tilde) ^ 2) + (hf_tilde ^ 2)))
       dtilde <- c(rep(dtilde0, p - n), dtilde1)
     }
-
+    
     sigma_mat <-
       eigenvec_sort %*% diag(as.numeric(dtilde)) %*% t(eigenvec_sort)
-
-    rownames(sigma_mat) <- colnames(data)
-    colnames(sigma_mat) <- colnames(data)
-
+    
+    rownames(sigma_mat) <- names_data
+    colnames(sigma_mat) <- names_data
+    
     return(list(sigma_mat, bandwidth_speed))
   }
