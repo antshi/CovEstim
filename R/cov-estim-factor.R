@@ -106,7 +106,6 @@ sigma_estim_lwcc_sf <-
 #'
 #' @param data an nxp data matrix.
 #' @param factors a nxf matrix with factors. Default value is NULL and the factor is equal to the cross-sectional average of all the variables in the data.
-#' @param zeromean_log a logical, indicating whether the data matrix has zero means (TRUE) or not (FALSE). Default value is FALSE.
 #' @return a list with the following entries
 #' \itemize{
 #' \item a pxp estimated covariance matrix.
