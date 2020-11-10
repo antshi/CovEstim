@@ -126,24 +126,19 @@ sigma_estim_lwcc_sf <-
 #' @export sigma_estim_efm
 #'
 sigma_estim_efm <- function(data,
-                            factors = NULL,
-                            zeromean_log = FALSE) {
+                            factors = NULL) {
+
   data <- as.matrix(data)
   names_data <- colnames(data)
   if (is.null(factors)) {
-    if (!zeromean_log) {
-      factors <- as.matrix(rowMeans(apply(data, 2, function(x)
-        x - mean(x))))
-    } else{
       factors <- as.matrix(rowMeans(data))
-    }
   }
   sigma_factors <-
     stats::var(factors, use = "pairwise", na.rm = TRUE)
-  fm <- stats::lm(data ~ factors - 1)
+  fm <- stats::lm(data ~ factors)
   rm(data, factors)
   gc()
-  factor_betas <- t(fm$coefficients)
+  factor_betas <- fm$coefficients[2,]
   sigma_res <- diag(diag(stats::var(fm$residuals)))
   sigma_fm <-
     as.matrix(factor_betas %*% sigma_factors %*% t(factor_betas))
